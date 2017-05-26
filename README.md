@@ -13,7 +13,7 @@ Note: This will only build on a Windows machine with ample memory and disk space
     +----------------------------------+    |
     | FROM microsoft/windowsservercore |    |
     +----------------------------------+    |
-    | Install rd to C:\Ruby22_x64      |    |
+    | Install rb to C:\Ruby22_x64      |    |
     | Install dk to C:\DevKit  |       |    |
     +----------------------|---|-------+    |
                            |   |            |
