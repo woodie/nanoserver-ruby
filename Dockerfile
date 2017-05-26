@@ -1,27 +1,32 @@
-FROM microsoft/nanoserver
+# Base Image
+FROM microsoft/nanoserver AS base
+
+# Core Image
+FROM microsoft/windowsservercore AS core
+
+ENV RUBY_MAJOR 2.2
+ENV RUBY_VERSION 2.2.4
+ENV DEVKIT_VERSION 4.7.2
+ENV DEVKIT_BUILD 20130224-1432
 
 RUN mkdir C:\\tmp
-RUN mkdir C:\\DevKit
+
+ADD https://dl.bintray.com/oneclick/rubyinstaller/rubyinstaller-${RUBY_VERSION}-x64.exe C:\\tmp
+RUN C:\\tmp\\rubyinstaller-%RUBY_VERSION%-x64.exe /silent /dir="C:\Ruby22_x64" /tasks="assocfiles,modpath"
+
+ADD https://dl.bintray.com/oneclick/rubyinstaller/DevKit-mingw64-64-${DEVKIT_VERSION}-${DEVKIT_BUILD}-sfx.exe C:\\tmp
+RUN C:\\tmp\\DevKit-mingw64-64-%DEVKIT_VERSION%-%DEVKIT_BUILD%-sfx.exe -o"C:\DevKit" -y
+
+# Final Image
+FROM base
+
+COPY --from=core C:\\Ruby22_x64 C:\\Ruby22_x64
+COPY --from=core C:\\DevKit C:\\DevKit
 
 WORKDIR C:\\DevKit
 
-SHELL ["powershell"]
+RUN setx PATH %PATH%;C:\DevKit\bin;C:\Ruby22_x64\bin -m
+RUN echo - C:\\Ruby22_x64 > config.yml
+RUN ruby dk.rb install
 
-RUN Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force ; \
-    Set-PSRepository -Name "PSGallery" -InstallationPolicy Trusted ; \
-    Install-Module -Name 7Zip4Powershell -Confirm:$false 
-
-ADD https://dl.bintray.com/oneclick/rubyinstaller/ruby-2.2.4-x64-mingw32.7z C:\\tmp
-# RUN Expand-7Zip -ArchiveFileName C:\\tmp\\ruby-2.2.4-x64-mingw32.7z -TargetPath C:\\Ruby224-x64
-
-ADD https://dl.bintray.com/oneclick/rubyinstaller/DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe C:\\tmp
-# RUN Expand-7Zip -ArchiveFileName C:\\tmp\\DevKit-mingw64-64-4.7.2-20130224-1432-sfx.exe -TargetPath C:\\DevKit
-
-# SHELL ["cmd"]
-
-# RUN rmdir /S /Q c:\\tmp
-
-# RUN echo - C:/Ruby224-x64 > config.yml
-# RUN ruby dk.rb install
-
-# CMD ["ruby","-v"]
+CMD ["irb"]
