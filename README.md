@@ -14,7 +14,7 @@ Fortunately, multi-stage build is the perfect solution. We can install everyting
     nanoserver-ruby                1.52 GB
     windowsservercore-ruby        10.80 GB
 
-Docker for Window Community Edition has no support for sharing host volumes, so using multi-stage build to copy files between containers is game changing.
+Docker for Window Community Edition has no support for sharing host volumes, so using multi-stage build to copy files between containers is the obvious solution.
 
     +------------------------------------+
     |  FROM microsoft/nanoserver as nano |--+
