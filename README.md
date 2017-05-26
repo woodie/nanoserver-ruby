@@ -2,7 +2,7 @@
 
 Ruby on nano server is a dynamic, reflective, object-oriented, general-purpose, open-source programming language.
 
-The `microsoft/nanoserver` base image has a small footprint, but does not include graphics libraries or the .NET Framework. The 7-Zip utility and Chocolatey package manager don't currently work on Nano because they requir .NET. Further, most EXE installers and all MSI installers don't work on Nano. The `microsoft/windowscoreserver` has none of these issues, but the footprint is ten times larger.
+The `microsoft/nanoserver` base image has a small footprint, but does not include graphics libraries or the .NET Framework. The 7-Zip utility and Chocolatey package manager don't currently work on Nano because they require .NET. Further, most EXE installers and all MSI installers don't work on Nano. The `microsoft/windowscoreserver` has none of these issues, but the footprint is ten times larger.
 
     REPOSITORY                        SIZE
     microsoft/nanoserver           1.02 GB
