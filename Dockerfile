@@ -1,7 +1,7 @@
-# Base Image
-FROM microsoft/nanoserver AS base
+# Base Nano Image
+FROM microsoft/nanoserver AS nano
 
-# Core Image
+# Temp Core Image
 FROM microsoft/windowsservercore AS core
 
 ENV RUBY_MAJOR 2.2
@@ -17,16 +17,14 @@ RUN C:\\tmp\\rubyinstaller-%RUBY_VERSION%-x64.exe /silent /dir="C:\Ruby22_x64" /
 ADD https://dl.bintray.com/oneclick/rubyinstaller/DevKit-mingw64-64-${DEVKIT_VERSION}-${DEVKIT_BUILD}-sfx.exe C:\\tmp
 RUN C:\\tmp\\DevKit-mingw64-64-%DEVKIT_VERSION%-%DEVKIT_BUILD%-sfx.exe -o"C:\DevKit" -y
 
-# Final Image
-FROM base
+# Final Nano Image
+FROM nano
 
 COPY --from=core C:\\Ruby22_x64 C:\\Ruby22_x64
 COPY --from=core C:\\DevKit C:\\DevKit
 
-WORKDIR C:\\DevKit
-
 RUN setx PATH %PATH%;C:\DevKit\bin;C:\Ruby22_x64\bin -m
 RUN echo - C:\\Ruby22_x64 > config.yml
-RUN ruby dk.rb install
+RUN ruby C:\\DevKit\\dk.rb install
 
 CMD ["irb"]
