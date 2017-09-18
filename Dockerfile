@@ -1,38 +1,36 @@
 # Temp Core Image
 FROM microsoft/windowsservercore AS core
 
-ENV RUBY_MAJOR 2.2
 ENV RUBY_VERSION 2.2.4
 ENV DEVKIT_VERSION 4.7.2
 ENV DEVKIT_BUILD 20130224-1432
 
 RUN mkdir C:\\tmp
-
 ADD https://dl.bintray.com/oneclick/rubyinstaller/rubyinstaller-${RUBY_VERSION}-x64.exe C:\\tmp
-RUN C:\\tmp\\rubyinstaller-%RUBY_VERSION%-x64.exe /silent /dir="C:\Ruby22_x64" /tasks="assocfiles,modpath"
-
+RUN C:\\tmp\\rubyinstaller-%RUBY_VERSION%-x64.exe /silent /dir="C:\Ruby" /tasks="assocfiles,modpath"
 ADD https://dl.bintray.com/oneclick/rubyinstaller/DevKit-mingw64-64-${DEVKIT_VERSION}-${DEVKIT_BUILD}-sfx.exe C:\\tmp
 RUN C:\\tmp\\DevKit-mingw64-64-%DEVKIT_VERSION%-%DEVKIT_BUILD%-sfx.exe -o"C:\DevKit" -y
 
 # Final Nano Image
 FROM microsoft/nanoserver AS nano
 
+ENV RUBY_VERSION 2.2.4
 ENV RUBYGEMS_VERSION 2.6.13
 ENV BUNDLER_VERSION 1.15.4
 
-COPY --from=core C:\\Ruby22_x64 C:\\Ruby22_x64
+COPY --from=core C:\\Ruby C:\\Ruby${RUBY_VERSION}_x64
 COPY --from=core C:\\DevKit C:\\DevKit
 
-RUN setx PATH %PATH%;C:\DevKit\bin;C:\Ruby22_x64\bin -m
-RUN echo - C:\\Ruby22_x64 > config.yml
+RUN setx PATH %PATH%;C:\DevKit\bin;C:\Ruby%RUBY_VERSION%_x64\bin -m
+RUN echo - C:\\Ruby%RUBY_VERSION%_x64 > config.yml
 RUN ruby C:\\DevKit\\dk.rb install
 
 RUN mkdir C:\\tmp
-
 ADD https://rubygems.org/gems/rubygems-update-${RUBYGEMS_VERSION}.gem C:\\tmp
-RUN gem install --local C:\tmp\rubygems-update-%RUBYGEMS_VERSION%.gem
+RUN gem install --local C:\tmp\rubygems-update-%RUBYGEMS_VERSION%.gem --no-ri --no-rdoc
+RUN rmdir C:\\tmp /s /q
 
-RUN update_rubygems
-RUN gem install bundler --version %BUNDLER_VERSION%
+RUN update_rubygems --no-ri --no-rdoc
+RUN gem install bundler --version %BUNDLER_VERSION% --no-ri --no-rdoc
 
 CMD [ "irb" ]
