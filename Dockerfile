@@ -7,7 +7,7 @@ ENV DEVKIT_BUILD 20130224-1432
 
 RUN mkdir C:\\tmp
 ADD https://dl.bintray.com/oneclick/rubyinstaller/rubyinstaller-${RUBY_VERSION}-x64.exe C:\\tmp
-RUN C:\\tmp\\rubyinstaller-%RUBY_VERSION%-x64.exe /silent /dir="C:\Ruby" /tasks="assocfiles,modpath"
+RUN C:\\tmp\\rubyinstaller-%RUBY_VERSION%-x64.exe /silent /dir="C:\Ruby_%RUBY_VERSION%_x64" /tasks="assocfiles,modpath"
 ADD https://dl.bintray.com/oneclick/rubyinstaller/DevKit-mingw64-64-${DEVKIT_VERSION}-${DEVKIT_BUILD}-sfx.exe C:\\tmp
 RUN C:\\tmp\\DevKit-mingw64-64-%DEVKIT_VERSION%-%DEVKIT_BUILD%-sfx.exe -o"C:\DevKit" -y
 
@@ -18,11 +18,12 @@ ENV RUBY_VERSION 2.2.4
 ENV RUBYGEMS_VERSION 2.6.13
 ENV BUNDLER_VERSION 1.15.4
 
-COPY --from=core C:\\Ruby C:\\Ruby${RUBY_VERSION}_x64
+COPY --from=core C:\\Ruby_${RUBY_VERSION}_x64 C:\\Ruby_${RUBY_VERSION}_x64
 COPY --from=core C:\\DevKit C:\\DevKit
 
-RUN setx PATH %PATH%;C:\DevKit\bin;C:\Ruby%RUBY_VERSION%_x64\bin -m
-RUN echo - C:\\Ruby%RUBY_VERSION%_x64 > config.yml
+RUN setx PATH %PATH%;C:\DevKit\bin;C:\Ruby_%RUBY_VERSION%_x64\bin -m
+RUN ruby C:\\DevKit\\dk.rb init
+RUN echo - C:\\Ruby_%RUBY_VERSION%_x64 > C:\\config.yml
 RUN ruby C:\\DevKit\\dk.rb install
 
 RUN mkdir C:\\tmp
